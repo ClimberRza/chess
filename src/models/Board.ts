@@ -64,6 +64,7 @@ class Board {
           return true
         }
       }
+      return false
     })
     const rowsWithFigures = rowsWithEnemies.map(row => {
       const res = []
