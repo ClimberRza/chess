@@ -27,9 +27,21 @@
   justify-content: center;
   align-items: center;
 
-  .pawn {
+  img {
     position: relative;
+    height: 58px;
+    width: 58px;
+  }
+
+  .pawn {
     left: -1px;  
+  }
+
+  &.selected {
+    background-color: rgb(128, 41, 41);
+    img {
+      scale: 1.15;
+    }
   }
 }
 
@@ -39,4 +51,57 @@
 
 .white {
   background-color: #e7dacb;
+}
+
+.available {
+  height: 12px;
+  width: 12px;
+  border-radius: 50%;
+  background-color: #22c022;
+}
+
+.ableForFigure {
+  background-color: green;
+}
+
+.turn {
+  margin-bottom: 10px;
+}
+
+.lostFiguresPanel {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  width: 20%;
+  right: 0 ;
+  background-color: #6d6e6d;
+  display: flex;
+  flex-direction: column;
+  padding: 20px;
+  min-width: 200px;
+
+  .playerDiv {
+    height: 50%;
+    ul {
+      list-style: none;
+      margin-top: 4px;
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      li {
+        display: flex;
+        align-items: center;
+        font-size: 17px;
+        img {
+          width: 30px;
+          height: 30px;
+          position: relative;
+          bottom: 2px;
+        }
+      }
+    }
+  }
+}
+
+.timer {
+  margin-right: 20px;
 }

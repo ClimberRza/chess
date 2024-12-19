@@ -1,6 +1,10 @@
+import { Colors } from './Colors'
+
 class Player {
-  constructor() {
-    
+  color: Colors
+  
+  constructor(color: Colors) {
+    this.color = color
   }
 }
 
