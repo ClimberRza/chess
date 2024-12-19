@@ -1,6 +1,7 @@
 import Cell from './Cell'
 import { Colors } from './Colors'
 import { Bishop } from './figures/Bishop'
+import { Figure, FigureNames } from './figures/Figure'
 import { King } from './figures/King'
 import { Knight } from './figures/Knight'
 import { Pawn } from './figures/Pawn'
@@ -9,6 +10,8 @@ import { Rook } from './figures/Rook'
 
 class Board {
   cells: Cell[][] = []
+  lostWhiteFigures: Figure[] = []
+  lostBlackFigures: Figure[] = []
 
   initCells() {
     for (let i = 0; i < 8; i++) {
@@ -24,8 +27,88 @@ class Board {
     }
   }
 
+  highlightCells(selectedCell: Cell | null) {
+    for (let i = 0; i < 8; i++) {
+      const row = this.cells[i]
+      for (let j = 0; j < 8; j++) {
+        const target = row[j]
+        target.available = !!selectedCell?.figure?.canMove(target)
+      }
+    }
+  }
+
+  addLostFigure(figure: Figure) {
+    if (figure.color === Colors.BLACK) {
+      this.lostBlackFigures.push(figure)
+    } else {
+      this.lostWhiteFigures.push(figure)
+    }
+  }
+
+  getCopyBoard(): Board {
+    const copyBoard = new Board()
+    copyBoard.cells = this.cells
+    copyBoard.lostBlackFigures = this.lostBlackFigures
+    copyBoard.lostWhiteFigures = this.lostWhiteFigures
+    return copyBoard
+  }
+
   getCell(x: number, y: number): Cell {
     return this.cells[y][x]
+  }
+
+  getEnemies(enemyColor: Colors) {
+    const rowsWithEnemies = this.cells.filter(row => {
+      for (let cell of row) {
+        if (cell.figure?.color === enemyColor) {
+          return true
+        }
+      }
+      return false
+    })
+    const rowsWithFigures = rowsWithEnemies.map(row => {
+      const res = []
+      for (let cell of row) {
+        if (cell.figure?.color === enemyColor) {
+          res.push(cell.figure)
+        }
+      }
+      return res
+    })
+    const enemyFigures = rowsWithFigures.reduce((acc, row) => {
+      acc.push(...row)
+      return acc
+    }, [])
+    return enemyFigures
+  }
+
+  getKingCell(color: Colors): Cell | undefined {
+    for (let row of this.cells) {
+      for (let cell of row) {
+        if (cell.figure?.name === FigureNames.KING && cell.figure.color === color) {
+          return cell
+        }
+      }
+    }
+  }
+
+  isKingInDanger(currentColor: Colors | undefined): {isShah: boolean, isMat: boolean} {
+    if (!currentColor) {
+      return {isShah: false, isMat: false}
+    }
+    const currentKingCell = this.getKingCell(currentColor)!
+    const currentKing = currentKingCell.figure as King
+    const enemyColor = currentColor === Colors.WHITE ? Colors.BLACK : Colors.WHITE
+    const enemyFigures = this.getEnemies(enemyColor)
+    for (let enemy of enemyFigures) {
+      if (enemy.canMove(currentKingCell)) {
+        if (currentKing.isCornered()) {
+          return {isShah: true, isMat: true}
+        } 
+        return {isShah: true, isMat: false}
+      }
+    }
+    return {isShah: false, isMat: false}
   }
 
   addFigures() {
